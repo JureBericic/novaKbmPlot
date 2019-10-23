@@ -1,26 +1,31 @@
 const parse = require('csv-parse');
+const fs = require('fs');
 
+const data = [];
 
-const parser = parse({delimiter: ':'});
+const parser = parse({
+    delimiter: ';',
+    from_line: 2
+});
 
-const output = [];
-
-parser.on('readable', function() {
-    let record;
-    while (record = parser.read()) {
-        output.push(record);
+function parseAmount(amount) {
+    if (amount === "") {
+        return 0;
     }
-});
 
-parser.on('error', function(err) {
-    console.log(err);
-});
+    return parseFloat(amount.replace(',', '.'));
+}
 
-parser.on('end', function() {
-    console.table(output);
-});
-
-parser.write("root:x:0:0:root:/root:/bin/bash\n");
-parser.write("someone:x:1022:1022::/home/someone:/bin/bash\n");
-
-parser.end();
+fs
+    // read file
+    .createReadStream('./data/promet_test.csv')
+    // parse csv
+    .pipe(parser)
+    // transform each line into needed form
+    .on('data', (line) => data.push({
+        date: new Date(line[4].split('.').reverse().join('-')),
+        amount: parseAmount(line[5]) - parseAmount(line[6]),
+        currency: line[7],
+    }))
+    // print data at the end
+    .on('end', () => {console.table(data)});
