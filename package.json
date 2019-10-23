@@ -3,6 +3,7 @@
     "version": "0.0.1",
     "description": "Plot of account balance.",
     "dependencies": {
-        "csv-parse": "^4.6.5"
+        "csv-parse": "^4.6.5",
+        "stream-transform": "^2.0.1"
     }
 }
